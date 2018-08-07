@@ -1,5 +1,5 @@
 # What I Can Eat?
-> You do not know what you can eat? Check it out!
+> You don't know what you can eat? Check it out!
 
 ## Table of contents
 * [Technologies](#technologies)
