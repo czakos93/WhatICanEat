@@ -7,7 +7,7 @@ import pl.dawidbronczak.spring.WhatICanEat.model.Ingredient;
 
 public interface IngredientRepository extends MongoRepository<Ingredient, String> {
 	
-	List<Ingredient> findByNameLike(String name);
+	List<Ingredient> findByNameLikeIgnoreCase(String name);
 	
 	Ingredient findByName(String name);
 }

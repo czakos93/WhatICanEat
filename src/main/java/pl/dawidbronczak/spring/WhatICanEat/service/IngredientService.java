@@ -14,7 +14,7 @@ public class IngredientService {
 	IngredientRepository ingredientRepo;
 	
 	public List<Ingredient> findIngredientsContains(String term) {
-		return ingredientRepo.findByNameLike(term);
+		return ingredientRepo.findByNameLikeIgnoreCase(term);
 	}
 	
 	public Ingredient insert(Ingredient ingredient) {
@@ -27,6 +27,10 @@ public class IngredientService {
 	
 	public List<Ingredient> findAll() {
 		return ingredientRepo.findAll();
+	}
+
+	public boolean isExist(Ingredient ingredient) {
+		return 	ingredientRepo.existsById(ingredient.getName());
 	}
 
 	

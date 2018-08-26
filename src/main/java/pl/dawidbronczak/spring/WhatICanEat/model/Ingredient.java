@@ -3,6 +3,7 @@ package pl.dawidbronczak.spring.WhatICanEat.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+
 @Document
 public class Ingredient {
 	
@@ -46,6 +47,8 @@ public class Ingredient {
 		}
 		return true;
 	}
+
+
 }
 
 
