@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function() {
+	var ingredients = []
+	$("#autocomplete-input").autocomplete({
+		source: function(request, response) {
+			$.ajax({
+				url: "/api/ingredients/autocomplete",
+				dataType: "json",
+				data: {
+					term: request.term
+				},
+				success: function(data) {
+					response($.map(data, function(suggestion){
+						return {
+							label: suggestion.name,
+							value: suggestion,
+						}
+					}))
+				}
+			})	
+		}
+	})	
+	$("#autocomplete-input").on("autocompleteselect",function(event,ui) {
+		for(var i = 0; i < ingredients.length; i++) {
+			if(ingredients[0].label === ui.item.label) {
+				$(this).val("")
+				alert("Produkt został już dodany")
+				return false
+			}
+		}	
+		ingredients.push(ui.item)
+		$("#ingredients").append("<p class=ingredient>"+ui.item.label+"</p>")
+		$(this).val("")
+		return false
+	})
+	$("#ingredients").on("click", ".ingredient", function(event) {
+		var index = ingredients.findIndex(ingredient => ingredient.label == event.target.innerHTML)
+		ingredients.splice(index, 1)
+		event.target.remove()
+	})
+	$("#search-recipes").on("click", function() {
+		$.ajax({
+			  type: "POST",
+			  url: "api/recipes",
+			  data: JSON.stringify(ingredients),
+			  dataType: "json",
+			  contentType: "application/json; charset=utf-8"
+			});
+	})
+
+})
+</script>
+<meta charset="UTF-8">
+<title>What I Can Eat</title>
+</head>
+<body>
+	<input type="text" id="autocomplete-input">
+	<div id="ingredients"></div>
+	<button id="search-recipes">Szukaj</button>
+	<p id="info">
+
+</body>
+</html>
