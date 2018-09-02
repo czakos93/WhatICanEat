@@ -10,7 +10,7 @@ $(document).ready(function() {
 	$("#autocomplete-input").autocomplete({
 		source: function(request, response) {
 			$.ajax({
-				url: "/api/ingredients/autocomplete",
+				url: "/api/ingredients",
 				dataType: "json",
 				data: {
 					term: request.term

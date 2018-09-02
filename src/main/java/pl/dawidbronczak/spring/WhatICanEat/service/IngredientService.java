@@ -1,6 +1,8 @@
 package pl.dawidbronczak.spring.WhatICanEat.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class IngredientService {
 		return ingredientRepo.insert(ingredient);
 	}
 	
-	public Ingredient findByName(String name) {
+	public Optional<Ingredient> findByName(String name) {
 		return ingredientRepo.findByName(name);
 	}
 	
