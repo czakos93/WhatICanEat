@@ -1,6 +1,8 @@
 package pl.dawidbronczak.spring.WhatICanEat.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -32,7 +34,11 @@ public class RecipeService {
 		return recipeRepo.findAll(); 
 	}
 
-	public Recipe findByName(String name) {
-		return recipeRepo.findByName(name);
+	public Optional<Recipe> findById(String name) {
+		return recipeRepo.findById(name);
+	}
+
+	public boolean isExist(String name) {
+		return recipeRepo.existsById(name);
 	}
 }

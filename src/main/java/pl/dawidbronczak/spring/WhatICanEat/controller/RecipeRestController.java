@@ -3,8 +3,13 @@ package pl.dawidbronczak.spring.WhatICanEat.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import pl.dawidbronczak.spring.WhatICanEat.assemblers.RecipeAssembler;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceAlreadyExistException;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceNotFoundException;
 import pl.dawidbronczak.spring.WhatICanEat.model.Ingredient;
 import pl.dawidbronczak.spring.WhatICanEat.model.Recipe;
 import pl.dawidbronczak.spring.WhatICanEat.service.IngredientService;
@@ -27,6 +35,9 @@ public class RecipeRestController {
 	
 	@Autowired
 	IngredientService ingredienService;
+	
+	@Autowired
+	RecipeAssembler recipeAssembler;
 
 	@PostMapping("/recipes/search")
 	public ResponseEntity<List<Recipe>> findRecipeByIngredients(@RequestBody List<Ingredient> ingredients){
@@ -35,19 +46,28 @@ public class RecipeRestController {
 	}
 	
 	@PostMapping("/recipes")
-	public ResponseEntity<Recipe> addRecipe(@RequestBody Recipe recipe) throws URISyntaxException {
-		URI location = new URI("/api/recipes/"+recipe.getName().replace(" ", "%20"));
-		recipeService.insert(recipe);
-		return ResponseEntity.created(location).build();
+	public ResponseEntity<Resource<Recipe>> addRecipe(@RequestBody Recipe recipe) throws URISyntaxException {
+		if(recipeService.isExist(recipe.getName())){
+			throw new ResourceAlreadyExistException(Recipe.class, recipe.getName());
+		}
+		Resource<Recipe> resource = recipeAssembler.toResource(recipeService.insert(recipe));
+		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).build();
 	}
 	
 	@GetMapping("/recipes")
-	public List<Recipe> getAllRecipes() {
-		return recipeService.findAll();
+	public Resources<Resource<Recipe>> getRecipes() {
+		List<Resource<Recipe>> recipes = recipeService.findAll().stream()
+				.map(recipeAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(recipes,
+				linkTo(methodOn(RecipeRestController.class).getRecipes()).withSelfRel());
 	}
 	
 	@GetMapping("/recipes/{name}")
-	public Recipe getRecipeByName(@PathVariable String name) {
-		return recipeService.findByName(name);
+	public Resource<Recipe> getRecipe(@PathVariable String name) {
+		Recipe recipe = recipeService.findById(name)
+				.orElseThrow(() -> new ResourceNotFoundException(Recipe.class, name));
+		return recipeAssembler.toResource(recipe);
 	}
+
 }
