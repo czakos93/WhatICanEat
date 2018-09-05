@@ -5,21 +5,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import pl.dawidbronczak.spring.WhatICanEat.exception.IngredientExistException;
-import pl.dawidbronczak.spring.WhatICanEat.exception.IngredientNotFoundException;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceAlreadyExistException;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class ExceptionAdvice {
 	
-	@ExceptionHandler(IngredientExistException.class)
+	@ExceptionHandler(ResourceAlreadyExistException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
-	String ingredientExistHandler(IngredientExistException exception) {
+	String ingredientExistHandler(ResourceAlreadyExistException exception) {
 		return exception.getMessage();
 	}
 	
-	@ExceptionHandler(IngredientNotFoundException.class)
+	@ExceptionHandler(ResourceNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	String ingredientNotFoundHandler(IngredientNotFoundException exception) {
+	String ingredientNotFoundHandler(ResourceNotFoundException exception) {
 		return exception.getMessage();
 	}
 }

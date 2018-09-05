@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import pl.dawidbronczak.spring.WhatICanEat.assemblers.IngredientResourceAssembler;
-import pl.dawidbronczak.spring.WhatICanEat.exception.IngredientExistException;
-import pl.dawidbronczak.spring.WhatICanEat.exception.IngredientNotFoundException;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceAlreadyExistException;
+import pl.dawidbronczak.spring.WhatICanEat.exception.ResourceNotFoundException;
 import pl.dawidbronczak.spring.WhatICanEat.model.Ingredient;
 import pl.dawidbronczak.spring.WhatICanEat.service.IngredientService;
 
@@ -34,12 +34,6 @@ public class IngredientRestController {
 	
 	@Autowired
 	IngredientResourceAssembler ingredientAssembler;
-	
-	
-	@GetMapping("/ingredients/autocomplete")
-	public List<Ingredient> getAutocompletSuggestions(@RequestParam("term") String term) {
-		return ingredientService.findIngredientsContains(term);
-	}
 	
 	@GetMapping("/ingredients")
 	public Resources<Resource<Ingredient>> getIngredients(@RequestParam(name = "term", required = false) String term) {
@@ -61,14 +55,14 @@ public class IngredientRestController {
 	@GetMapping("/ingredients/{name}")
 	public Resource<Ingredient> getIngredient(@PathVariable String name){
 		Ingredient ingredient = ingredientService.findByName(name)
-				.orElseThrow(() -> new IngredientNotFoundException(name));
+				.orElseThrow(() -> new ResourceNotFoundException(Ingredient.class, name));
 		return ingredientAssembler.toResource(ingredient);
 	}
 	
 	@PostMapping("/ingredients")
 	public ResponseEntity<Resource<Ingredient>> addIngredient(@RequestBody Ingredient ingredient) throws URISyntaxException{
-		if(ingredientService.isExist(ingredient)) {
-			throw new IngredientExistException(ingredient.getName());
+		if(ingredientService.isExist(ingredient.getName())) {
+			throw new ResourceAlreadyExistException(Ingredient.class, ingredient.getName());
 		}
 		Resource<Ingredient> resource = ingredientAssembler.toResource(ingredientService.insert(ingredient));
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);

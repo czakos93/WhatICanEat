@@ -31,9 +31,10 @@ public class IngredientService {
 		return ingredientRepo.findAll();
 	}
 
-	public boolean isExist(Ingredient ingredient) {
-		return 	ingredientRepo.existsById(ingredient.getName());
+	public boolean isExist(String name) {
+		return 	ingredientRepo.existsById(name);
 	}
+
 
 	
 }
